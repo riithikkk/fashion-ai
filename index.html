@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FashionAI Business Assistant</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="logo">F</div><div><b>FashionAI</b><span>MSME Assistant</span></div></div>
+    <nav id="nav">
+      <button class="nav active" data-page="dashboard">⌂ <span>Dashboard</span></button>
+      <button class="nav" data-page="trends">↗ <span>Trend Engine</span></button>
+      <button class="nav" data-page="pricing">₹ <span>Price Assistant</span></button>
+      <button class="nav" data-page="reviews">★ <span>Review Analyzer</span></button>
+      <button class="nav" data-page="opportunities">✦ <span>Opportunity Finder</span></button>
+      <button class="nav" data-page="simulator">◈ <span>Price Simulator</span></button>
+      <button class="nav" data-page="copilot">✦ <span>AI Copilot</span></button>
+    </nav>
+    <div class="side-foot">Prototype mode<br><span>Java API • Local data</span></div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><div class="eyebrow">FASHION BUSINESS INTELLIGENCE</div><h1 id="pageTitle">Business Dashboard</h1></div>
+      <div class="status"><i></i> Backend connected</div>
+    </header>
+
+    <section id="dashboard" class="page active">
+      <div class="hero">
+        <div><span class="pill">AI-POWERED</span><h2>Turn fashion signals into business decisions.</h2>
+        <p>Discover what to make, what to charge and what customers want—using explainable scores.</p>
+        <button class="primary" onclick="go('opportunities')">Find Best Opportunities →</button></div>
+        <div class="hero-art"><div class="orb">AI</div></div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="grid two">
+        <div class="card"><div class="card-head"><h3>Rising Trends</h3><button class="textbtn" onclick="go('trends')">View all</button></div><div id="dashTrends"></div></div>
+        <div class="card"><div class="card-head"><h3>Business Alerts</h3></div><div id="alerts"></div></div>
+      </div>
+    </section>
+
+    <section id="trends" class="page">
+      <div class="section-intro"><div><span class="pill">MODULE 01</span><h2>Trend Engine</h2><p>Combine search, social, bestseller and visual signals into an explainable trend score.</p></div><button class="primary" onclick="refreshTrends()">Refresh signals</button></div>
+      <div class="grid two" id="trendCards"></div>
+      <div class="card"><div class="card-head"><h3>Trend Lifecycle</h3><span class="muted">Estimated market position</span></div><div id="trendTable"></div></div>
+    </section>
+
+    <section id="pricing" class="page">
+      <div class="section-intro"><div><span class="pill">MODULE 02</span><h2>Price Assistant</h2><p>Get a recommended price range from competitor price, trend direction and stock.</p></div></div>
+      <div class="card form-card">
+        <label>Product<select id="priceProduct"></select></label>
+        <div class="form-grid">
+          <label>Your current price <input id="currentPrice" type="number" value="699" min="1"></label>
+          <label>Stock units <input id="stock" type="number" value="120" min="0"></label>
+          <label>Competitor low <input id="compLow" type="number" value="649" min="1"></label>
+          <label>Competitor high <input id="compHigh" type="number" value="799" min="1"></label>
+        </div>
+        <button class="primary" onclick="calculatePrice()">Calculate recommendation</button>
+      </div>
+      <div id="priceResult"></div>
+    </section>
+
+    <section id="reviews" class="page">
+      <div class="section-intro"><div><span class="pill">MODULE 03</span><h2>Review & Return Analyzer</h2><p>Classify feedback into actionable business buckets.</p></div></div>
+      <div class="card form-card"><label>Paste a customer review<textarea id="reviewText" placeholder="Example: The shirt looks good but the medium size is too tight."></textarea></label><button class="primary" onclick="analyzeReview()">Analyze review</button><div id="reviewResult"></div></div>
+      <div class="grid two"><div class="card"><div class="card-head"><h3>Feedback distribution</h3></div><div id="reviewBars"></div></div><div class="card"><div class="card-head"><h3>Recommended actions</h3></div><div id="reviewActions"></div></div></div>
+    </section>
+
+    <section id="opportunities" class="page">
+      <div class="section-intro"><div><span class="pill">SIGNATURE FEATURE</span><h2>Fashion Opportunity Finder</h2><p>Ranks products by trend, longevity, competition gap, margin, stock and customer sentiment.</p></div><button class="primary" onclick="loadOpportunities()">Recalculate</button></div>
+      <div id="opportunityList"></div>
+    </section>
+
+    <section id="simulator" class="page">
+      <div class="section-intro"><div><span class="pill">SIGNATURE FEATURE</span><h2>Price Simulator</h2><p>Move the price and see an explainable demand and margin estimate.</p></div></div>
+      <div class="card simulator">
+        <label>Product<select id="simProduct" onchange="simulate()"></select></label>
+        <div class="price-big">₹<span id="simPrice">699</span></div>
+        <input id="priceRange" type="range" min="299" max="1499" value="699" step="10" oninput="simulate()">
+        <div class="range-label"><span>₹299</span><span>₹1,499</span></div>
+        <div id="simResult"></div>
+      </div>
+    </section>
+
+    <section id="copilot" class="page">
+      <div class="section-intro"><div><span class="pill">AI COPILOT</span><h2>Fashion Business Copilot</h2><p>Ask a business question and get a recommendation based on the current dashboard data.</p></div></div>
+      <div class="card chat">
+        <div id="chatLog" class="chatlog"><div class="msg ai">Hi! Ask me what to make, what to price, which trend is safest, or why customers are unhappy.</div></div>
+        <div class="chat-input"><input id="chatInput" placeholder="e.g. What should I manufacture next?"><button class="primary" onclick="askCopilot()">Ask</button></div>
+        <div class="quick"><button onclick="quickAsk('What should I manufacture next?')">What should I make?</button><button onclick="quickAsk('Which trend is safest?')">Safest trend?</button><button onclick="quickAsk('What should I fix from reviews?')">What should I fix?</button></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toast"></div>
+<script>
+const API = location.origin;
+const $ = id => document.getElementById(id);
+const money = n => "₹" + Math.round(n).toLocaleString("en-IN");
+
+function toast(t){$("toast").textContent=t;$("toast").classList.add("show");setTimeout(()=>$("toast").classList.remove("show"),2200)}
+async function api(path, options={}){
+  const r=await fetch(API+path, {headers:{"Content-Type":"application/json"},...options});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+function go(page){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  $(page).classList.add("active");
+  document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+  $("pageTitle").textContent={dashboard:"Business Dashboard",trends:"Trend Engine",pricing:"Price Assistant",reviews:"Review Analyzer",opportunities:"Opportunity Finder",simulator:"Price Simulator",copilot:"AI Copilot"}[page];
+  if(page==="trends") refreshTrends(); if(page==="opportunities") loadOpportunities(); if(page==="reviews") loadReviews(); if(page==="pricing") loadProducts(); if(page==="simulator") loadProducts();
+}
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>go(b.dataset.page));
+
+async function init(){
+  try{
+    const d=await api("/api/dashboard"); renderStats(d); renderDashTrends(d.trends); renderAlerts(d.alerts);
+    await loadProducts(); await loadReviews(); await loadOpportunities(); simulate();
+  }catch(e){toast("Cannot connect to Java backend");console.error(e)}
+}
+function renderStats(d){$("stats").innerHTML=`<div class="stat"><span>Trend score</span><b>${d.trendScore}</b><small>Average market momentum</small></div><div class="stat"><span>Top opportunity</span><b>${d.topOpportunity}</b><small>Highest opportunity score</small></div><div class="stat"><span>Review issue</span><b>${d.topReviewIssue}</b><small>Most common feedback</small></div><div class="stat"><span>Risk level</span><b>${d.risk}</b><small>Portfolio production risk</small></div>`}
+function trendHTML(t){return `<div class="trend-row"><div class="trend-icon">↗</div><div class="grow"><b>${t.name}</b><span>${t.category} • ${t.colour}</span></div><strong>${t.score}</strong><em class="${t.direction.toLowerCase()}">${t.direction}</em></div>`}
+function renderDashTrends(ts){$("dashTrends").innerHTML=ts.slice(0,4).map(trendHTML).join("")}
+function renderAlerts(a){$("alerts").innerHTML=a.map(x=>`<div class="alert"><span>${x.level==="HIGH"?"⚠":"●"}</span><div><b>${x.title}</b><p>${x.text}</p></div></div>`).join("")}
+
+async function refreshTrends(){
+  const d=await api("/api/trends");
+  $("trendCards").innerHTML=d.slice(0,4).map(t=>`<div class="card trend-card"><div class="card-head"><h3>${t.name}</h3><strong class="score">${t.score}/100</strong></div><div class="meter"><i style="width:${t.score}%"></i></div><div class="metrics"><span>Search <b>${t.search}</b></span><span>Social <b>${t.social}</b></span><span>Bestseller <b>${t.bestseller}</b></span><span>Vision <b>${t.vision}</b></span></div><p>${t.explanation}</p><div class="tagline">Lead time ${t.leadTime} days • Trend window ${t.window} days</div></div>`).join("");
+  $("trendTable").innerHTML=`<table><thead><tr><th>Product</th><th>Stage</th><th>Direction</th><th>Lead time</th><th>Risk</th></tr></thead><tbody>${d.map(t=>`<tr><td><b>${t.name}</b></td><td>${t.stage}</td><td><span class="${t.direction.toLowerCase()}">${t.direction}</span></td><td>${t.leadTime} days</td><td>${t.risk}</td></tr>`).join("")}</tbody></table>`;
+}
+
+async function loadProducts(){
+  const d=await api("/api/products");
+  ["priceProduct","simProduct"].forEach(id=>{const s=$(id);s.innerHTML=d.map(p=>`<option value="${p.name}">${p.name}</option>`).join("")});
+  if(d[0]) $("priceProduct").value=d[0].name;
+}
+async function calculatePrice(){
+  const body={product:$("priceProduct").value,currentPrice:+$("currentPrice").value,stock:+$("stock").value,competitorLow:+$("compLow").value,competitorHigh:+$("compHigh").value};
+  const d=await api("/api/pricing",{method:"POST",body:JSON.stringify(body)});
+  $("priceResult").innerHTML=`<div class="result-card"><div><span class="pill">RECOMMENDED</span><h2>${money(d.low)} – ${money(d.high)}</h2><p>${d.action}</p></div><div class="score-ring">${d.score}<small>/100</small></div></div><div class="reason-grid">${d.reasons.map(x=>`<div><b>${x.label}</b><span>${x.value}</span></div>`).join("")}</div>`;
+}
+async function loadReviews(){
+  const d=await api("/api/reviews");
+  $("reviewBars").innerHTML=d.buckets.map(x=>`<div class="barrow"><span>${x.category}</span><div><i style="width:${x.percent}%"></i></div><b>${x.percent}%</b></div>`).join("");
+  $("reviewActions").innerHTML=d.actions.map(x=>`<div class="action"><b>${x.category}</b><p>${x.action}</p></div>`).join("");
+}
+async function analyzeReview(){
+  const text=$("reviewText").value.trim(); if(!text)return toast("Enter a review first");
+  const d=await api("/api/reviews/analyze",{method:"POST",body:JSON.stringify({text})});
+  $("reviewResult").innerHTML=`<div class="analysis"><span class="pill">${d.category}</span><b>${d.sentiment}</b><span>Confidence ${d.confidence}%</span><p>${d.action}</p></div>`;
+  loadReviews();
+}
+async function loadOpportunities(){
+  const d=await api("/api/opportunities");
+  $("opportunityList").innerHTML=d.map((x,i)=>`<div class="op-card"><div class="rank">#${i+1}</div><div class="grow"><h3>${x.product}</h3><p>${x.reason}</p><div class="chips"><span>Trend ${x.trend}</span><span>Longevity ${x.longevity}</span><span>Gap ${x.gap}</span><span>Margin ${x.margin}</span><span>Risk ${x.risk}</span></div></div><div class="opp-score"><b>${x.score}</b><span>/100</span></div></div>`).join("");
+}
+async function simulate(){
+  const p=+$("priceRange").value; $("simPrice").textContent=p.toLocaleString("en-IN");
+  const product=$("simProduct").value||"Oversized Black T-shirt";
+  const d=await api("/api/simulate?product="+encodeURIComponent(product)+"&price="+p);
+  $("simResult").innerHTML=`<div class="sim-grid"><div><span>Estimated demand</span><b>${d.demand}%</b><small>${d.demandLabel}</small></div><div><span>Margin index</span><b>${d.margin}%</b><small>${d.marginLabel}</small></div><div><span>Market fit</span><b>${d.fit}</b><small>${d.fitLabel}</small></div><div><span>Decision</span><b>${d.decision}</b><small>${d.reason}</small></div></div>`;
+}
+async function askCopilot(){
+  const q=$("chatInput").value.trim(); if(!q)return;
+  $("chatLog").innerHTML+=`<div class="msg user">${q}</div>`;$("chatInput").value="";
+  const d=await api("/api/copilot",{method:"POST",body:JSON.stringify({question:q})});
+  $("chatLog").innerHTML+=`<div class="msg ai">${d.answer}</div>`;$("chatLog").scrollTop=$("chatLog").scrollHeight;
+}
+function quickAsk(q){$("chatInput").value=q;askCopilot()}
+$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")askCopilot()});
+init();
+</script>
+</body>
+</html>
